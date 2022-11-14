@@ -6,15 +6,15 @@ type idInterface struct {
 
 type responseAdressInterface struct {
 	Boroungh string `json:"alcaldia"`
-	City string `json:"ciudad"`
-	Street string `json:"calle"`
+	City     string `json:"ciudad"`
+	Street   string `json:"calle"`
 }
 
 type Info struct {
 	Copyright struct {
-		Text         string `json:"text"`         // "© 2014 MapQuest, Inc."
-		ImageURL     string `json:"imageUrl"`     // "http://api.mqcdn.com/res/mqlogo.gif"
-		ImageAltText string `json:"imageAltText"` // "© 2014 MapQuest, Inc."
+		Text         string `json:"text"`
+		ImageURL     string `json:"imageUrl"`
+		ImageAltText string `json:"imageAltText"`
 	} `json:"copyright"`
 	Statuscode int      `json:"statuscode"`
 	Messages   []string `json:"messages"`
@@ -81,4 +81,13 @@ type locationStructure struct {
 	} `json:"options"`
 	IncludeNearestIntersection bool `json:"includeNearestIntersection"`
 	IncludeRoadMetadata        bool `json:"includeRoadMetadata"`
+}
+
+type responseHasuraId struct {
+	Data struct {
+		Mb []struct {
+			PositionLatitude  float64 `json:"position_latitude"`
+			PositionLongitude int     `json:"position_longitude"`
+		} `json:"mb"`
+	} `json:"data"`
 }

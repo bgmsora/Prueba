@@ -9,7 +9,7 @@ func main() {
 
 	router.GET("/", healthcheck)
 	router.POST("/locationIdUnit", basicAuth, LocationIdUnit)
-	router.POST("/locationsUnits", basicAuth, LocationsUnits)
+	router.POST("/unitsAvailable", basicAuth, UnitsAvailable)
 	router.POST("/boroughs", basicAuth, BoroughsAvailable)
 	router.POST("/unitsBorough", basicAuth, unitsPerBorough)
 

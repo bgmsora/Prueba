@@ -1,17 +1,14 @@
 package main
 
 import (
-	"errors"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	//"github.com/hasura/go-graphql-client" //para graphql
-	//"golang.org/x/oauth2" //para graphql
 )
-
 
 func basicAuth(c *gin.Context) {
 	reqUser, reqPass, hasAuth := c.Request.BasicAuth()
@@ -32,22 +29,23 @@ func LocationIdUnit(c *gin.Context) {
 	if err := c.BindJSON(&payload); err != nil {
 		var errorString string = fmt.Sprintf("Error in payload: %v\n%s", payload, err.Error())
 		fmt.Println(errorString)
+		c.Data(http.StatusOK, "application/json", []byte(errorString))
 		return
 	}
 	fmt.Println("Id consulted-> ", payload.Id)
 
 	//Consulta a Hasura
-	/*
-	src := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("HASURA_GRAPHQL_ADMIN_SECRET")},
-	)
-	httpClient := oauth2.NewClient(context.Background(), src)
-
-	client := graphql.NewClient("http://localhost:8080/graphql", httpClient)
-    */
+	hasuraResponse := hasuraRequestId(payload.Id)
+	fmt.Println(hasuraResponse)
+	if len(hasuraResponse.Data.Mb) == 0 {
+		var errorString string = fmt.Sprintf("Id not exist in DB: %d\n", payload.Id)
+		fmt.Println(errorString)
+		c.Data(http.StatusOK, "application/json", []byte(errorString))
+		return
+	}
 
 	//Obtener Direccion con base a las coordenadas y regresarla en formato Json
-	response := reverseGeocode(19.440222, -99.133207)
+	response := reverseGeocode(hasuraResponse.Data.Mb[0].PositionLatitude, float64(hasuraResponse.Data.Mb[0].PositionLongitude))
 	fmt.Println(response)
 	bytesResponse, err := json.Marshal(response)
 	if err != nil {
@@ -57,8 +55,7 @@ func LocationIdUnit(c *gin.Context) {
 	c.Data(http.StatusOK, "application/json", bytesResponse)
 }
 
-
-func LocationsUnits(c *gin.Context) {
+func UnitsAvailable(c *gin.Context) {
 
 }
 
@@ -67,7 +64,7 @@ func BoroughsAvailable(c *gin.Context) {
 }
 
 func unitsPerBorough(c *gin.Context) {
-	
+
 }
 
 func healthcheck(c *gin.Context) {

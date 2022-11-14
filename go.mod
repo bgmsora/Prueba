@@ -2,10 +2,7 @@ module Api/root
 
 go 1.19
 
-require (
-	github.com/gin-gonic/gin v1.8.1
-	github.com/jasonwinn/geocoder v0.0.0-20190118154513-0a8a678400b8
-)
+require github.com/gin-gonic/gin v1.8.1
 
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
