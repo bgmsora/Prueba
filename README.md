@@ -13,6 +13,8 @@ Prueba técnica: Data pipeline
 
 ### 2. Analisis de los datos
 1. Se revisaran las consultas que se piden y los datos que se tienen para dar una solucion optima
+2. Traducir coordenadas a direcciones
+
 
 
 ### Nota
