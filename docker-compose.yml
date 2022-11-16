@@ -1,5 +1,22 @@
 version: '3.6'
 services:
+  dev:
+    depends_on:
+    - "graphql-engine"
+    container_name: go_root
+    env_file: ./.env
+    build:
+      context: .
+      target: dev
+      dockerfile: ./dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
   postgres:
     image: postgres:12
     restart: always
