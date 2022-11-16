@@ -91,3 +91,20 @@ type responseHasuraId struct {
 		} `json:"mb"`
 	} `json:"data"`
 }
+
+type responseHasuraUnitsAvailable struct {
+	Data struct {
+		Mb []struct {
+			dataVehicle
+		} `json:"mb"`
+	} `json:"data"`
+}
+
+type dataVehicle struct {
+	Vehicle_id        int     `json:"vehicle_id"`
+	PositionLatitude  float64 `json:"position_latitude"`
+	PositionLongitude int     `json:"position_longitude"`
+	Trip_start_date   int     `json:"trip_start_date"`
+	Trip_id           int     `json:"trip_id"`
+	Position_speed    int     `json:"position_speed"`
+}

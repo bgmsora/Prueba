@@ -62,13 +62,30 @@ func ReverseGeocode(lat float64, lng float64) (add responseAdressInterface) {
 
 const queryBusId string = "{\"query\":\"query MyQuery ($id:Int){\\r\\n  mb(where: {vehicle_id: {_eq: $id}}) {\\r\\n    position_latitude\\r\\n    position_longitude\\r\\n  }\\r\\n}\",\"variables\":{\"id\":XWFFF}}"
 
-// XWFFF
-
 func HasuraRequestId(id int) (add responseHasuraId) {
 	data := strings.Replace(queryBusId, "XWFFF", strconv.Itoa(id), 1)
 	fmt.Println(data)
 	payload := strings.NewReader(data)
 
+	body := hasuraRequest(payload)
+	if body == nil {
+		fmt.Println(body)
+		return
+	}
+	fmt.Println(string(body))
+
+	if err := json.Unmarshal(body, &add); err != nil {
+		nerr := fmt.Errorf("%s: %s, No se pudo parsear", err.Error(), body)
+		fmt.Println((nerr.Error()))
+		return
+	}
+	return add
+}
+
+const queryUnitsAvailable string = "{\"query\":\"query MyQuery {\\r\\n  mb(where: {trip_schedule_relationship: {_eq: 0}}) {\\r\\n    vehicle_id\\r\\n    position_latitude\\r\\n    position_longitude\\r\\n    trip_start_date\\r\\n    trip_id\\r\\n    position_speed\\r\\n    \\r\\n  }\\r\\n}\",\"variables\":{}}"
+
+func HasuraRequestUnitAvailable() (add responseHasuraUnitsAvailable) {
+	payload := strings.NewReader(queryUnitsAvailable)
 	body := hasuraRequest(payload)
 	if body == nil {
 		fmt.Println(body)

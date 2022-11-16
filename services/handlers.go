@@ -34,7 +34,7 @@ func LocationIdUnit(c *gin.Context) {
 	}
 	fmt.Println("Id consulted-> ", payload.Id)
 
-	//Consulta a Hasura
+	//Consulta a Graphql
 	hasuraResponse := HasuraRequestId(payload.Id)
 	fmt.Println(hasuraResponse)
 	if len(hasuraResponse.Data.Mb) == 0 {
@@ -56,7 +56,21 @@ func LocationIdUnit(c *gin.Context) {
 }
 
 func UnitsAvailable(c *gin.Context) {
-
+	//Consulta a Graphql
+	hasuraResponse := HasuraRequestUnitAvailable()
+	fmt.Println(hasuraResponse)
+	if len(hasuraResponse.Data.Mb) == 0 {
+		var errorString string = fmt.Sprintf("No hay unidades disponibles")
+		fmt.Println(errorString)
+		c.Data(http.StatusOK, "application/json", []byte(errorString))
+		return
+	}
+	bytesResponse, err := json.Marshal(hasuraResponse)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	c.Data(http.StatusOK, "application/json", bytesResponse)
 }
 
 func BoroughsAvailable(c *gin.Context) {
