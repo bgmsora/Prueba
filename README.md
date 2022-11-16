@@ -13,13 +13,10 @@ Prueba técnica: Data pipeline
 
 ### 2. Analisis de los datos
 1. Se revisaran las consultas que se piden y los datos que se tienen para dar una solucion optima
-2. Traducir coordenadas a direcciones
-
-
+2. Traducir coordenadas a direcciones, se ocupo una Api externa, porque se intento ocupar un json interno, pero pesaba demasiado para incluirlo en un docker
 
 ### Nota
 Todas los datos de acceso o configuraciones se encuentran en el archivo .env, que fue enviado con el correo
-
 
 ### Postman Workspace
 Pruebas integrales 
