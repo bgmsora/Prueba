@@ -24,7 +24,7 @@ func BasicAuth(c *gin.Context) {
 }
 
 func LocationIdUnit(c *gin.Context) {
-	//! Body Http
+	// Body Http
 	var payload idInterface
 	if err := c.BindJSON(&payload); err != nil {
 		var errorString string = fmt.Sprintf("Error in payload: %v\n%s", payload, err.Error())
@@ -45,7 +45,7 @@ func LocationIdUnit(c *gin.Context) {
 	}
 
 	//Obtener Direccion con base a las coordenadas y regresarla en formato Json
-	response := ReverseGeocode(hasuraResponse.Data.Mb[0].PositionLatitude, float64(hasuraResponse.Data.Mb[0].PositionLongitude))
+	response := ReverseGeocode(hasuraResponse.Data.Mb[0].PositionLatitude, hasuraResponse.Data.Mb[0].PositionLongitude)
 	fmt.Println(response)
 	bytesResponse, err := json.Marshal(response)
 	if err != nil {
@@ -78,7 +78,32 @@ func BoroughsAvailable(c *gin.Context) {
 }
 
 func UnitsPerBorough(c *gin.Context) {
+	// Body Http
+	var payload boroughInterface
+	if err := c.BindJSON(&payload); err != nil {
+		var errorString string = fmt.Sprintf("Error in payload: %v\n%s", payload, err.Error())
+		fmt.Println(errorString)
+		c.Data(http.StatusOK, "application/json", []byte(errorString))
+		return
+	}
+	fmt.Println("Borough consulted-> ", payload.Borough)
 
+	hasuraResponse := HasuraRequestUnits()
+	fmt.Println(hasuraResponse)
+	if len(hasuraResponse.Data.Mb) == 0 {
+		var errorString string = fmt.Sprintf("No hay unidades disponibles")
+		fmt.Println(errorString)
+		c.Data(http.StatusOK, "application/json", []byte(errorString))
+		return
+	}
+
+	unitsBorough := filterBorough(hasuraResponse, payload.Borough)
+	bytesResponse, err := json.Marshal(unitsBorough)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	c.Data(http.StatusOK, "application/json", bytesResponse)
 }
 
 func Healthcheck(c *gin.Context) {

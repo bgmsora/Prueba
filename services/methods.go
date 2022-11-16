@@ -54,7 +54,7 @@ func ReverseGeocode(lat float64, lng float64) (add responseAdressInterface) {
 	if len(address.Results[0].Locations) == 0 {
 		return
 	}
-	add.Boroungh = address.Results[0].Locations[0].AdminArea5
+	add.Borough = address.Results[0].Locations[0].AdminArea5
 	add.City = address.Results[0].Locations[0].AdminArea4
 	add.Street = address.Results[0].Locations[0].Street
 	return add
@@ -99,6 +99,36 @@ func HasuraRequestUnitAvailable() (add responseHasuraUnitsAvailable) {
 		return
 	}
 	return add
+}
+
+const queryUnits string = "{\"query\":\"query MyQuery {\\r\\n  mb {\\r\\n    vehicle_id\\r\\n    position_latitude\\r\\n    position_longitude\\r\\n    trip_start_date\\r\\n    trip_id\\r\\n    position_speed\\r\\n    \\r\\n  }\\r\\n}\",\"variables\":{}}"
+
+func HasuraRequestUnits() (add responseHasuraUnitsAvailable) {
+	payload := strings.NewReader(queryUnits)
+	body := hasuraRequest(payload)
+	if body == nil {
+		fmt.Println(body)
+		return
+	}
+	fmt.Println(string(body))
+
+	if err := json.Unmarshal(body, &add); err != nil {
+		nerr := fmt.Errorf("%s: %s, No se pudo parsear", err.Error(), body)
+		fmt.Println((nerr.Error()))
+		return
+	}
+	return add
+}
+
+func filterBorough(units responseHasuraUnitsAvailable, borough string) (new responseHasuraUnitsAvailable) {
+	for _, arr := range units.Data.Mb {
+		response := ReverseGeocode(arr.PositionLatitude, arr.PositionLongitude)
+		fmt.Println(response)
+		if response.Borough == borough {
+			new.Data.Mb = append(new.Data.Mb, arr)
+		}
+	}
+	return new
 }
 
 func hasuraRequest(payload *strings.Reader) (body []byte) {
