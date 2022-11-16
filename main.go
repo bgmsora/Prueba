@@ -1,17 +1,19 @@
 package main
 
 import (
+	"Api/root/services"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	router := gin.Default()
 
-	router.GET("/", healthcheck)
-	router.POST("/locationIdUnit", basicAuth, LocationIdUnit)
-	router.POST("/unitsAvailable", basicAuth, UnitsAvailable)
-	router.POST("/boroughs", basicAuth, BoroughsAvailable)
-	router.POST("/unitsBorough", basicAuth, unitsPerBorough)
+	router.GET("/", services.Healthcheck)
+	router.POST("/locationIdUnit", services.BasicAuth, services.LocationIdUnit)
+	router.POST("/unitsAvailable", services.BasicAuth, services.UnitsAvailable)
+	router.POST("/boroughs", services.BasicAuth, services.BoroughsAvailable)
+	router.POST("/unitsBorough", services.BasicAuth, services.UnitsPerBorough)
 
 	router.Run("0.0.0.0:3001")
 }
