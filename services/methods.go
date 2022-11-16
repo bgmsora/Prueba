@@ -131,6 +131,32 @@ func filterBorough(units responseHasuraUnitsAvailable, borough string) (new resp
 	return new
 }
 
+func getBorough(units responseHasuraUnitsAvailable) []string {
+	boroughs := make([]string, 31)
+	for _, arr := range units.Data.Mb {
+		response := ReverseGeocode(arr.PositionLatitude, arr.PositionLongitude)
+		fmt.Println(response)
+		if response.City == "Ciudad de México" {
+			boroughs = append(boroughs, response.Borough)
+		}
+	}
+	aux := removeDuplicateStr(boroughs)
+	remove := aux[1:]
+	return remove
+}
+
+func removeDuplicateStr(strSlice []string) []string {
+	allKeys := make(map[string]bool)
+	list := []string{}
+	for _, item := range strSlice {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+			list = append(list, item)
+		}
+	}
+	return list
+}
+
 func hasuraRequest(payload *strings.Reader) (body []byte) {
 	url := "http://host.docker.internal:8080/v1/graphql"
 	method := "POST"

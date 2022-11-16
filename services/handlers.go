@@ -74,7 +74,21 @@ func UnitsAvailable(c *gin.Context) {
 }
 
 func BoroughsAvailable(c *gin.Context) {
-
+	hasuraResponse := HasuraRequestUnits()
+	fmt.Println(hasuraResponse)
+	if len(hasuraResponse.Data.Mb) == 0 {
+		var errorString string = fmt.Sprintf("No hay unidades disponibles")
+		fmt.Println(errorString)
+		c.Data(http.StatusOK, "application/json", []byte(errorString))
+		return
+	}
+	unitsBorough := getBorough(hasuraResponse)
+	bytesResponse, err := json.Marshal(unitsBorough)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	c.Data(http.StatusOK, "application/json", bytesResponse)
 }
 
 func UnitsPerBorough(c *gin.Context) {

@@ -112,3 +112,9 @@ type dataVehicle struct {
 	Trip_id           int     `json:"trip_id"`
 	Position_speed    int     `json:"position_speed"`
 }
+
+type responseBoroughs struct {
+	Data []struct {
+		boroughInterface
+	} `json:"data"`
+}
