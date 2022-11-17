@@ -1,5 +1,7 @@
 package services
 
+//En este archivo se encuentran todas las estructuras que se ocuparan en la Api
+
 type idInterface struct {
 	Id int `json:"id"`
 }

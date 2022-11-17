@@ -1,0 +1,300 @@
+apiVersion: v1
+items:
+    #Graphql
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: graphql-engine
+      name: graphql-engine
+    spec:
+      type: LoadBalancer
+      ports:
+        - name: "8080"
+          port: 8080
+          targetPort: 8080
+      selector:
+        io.kompose.service: graphql-engine
+    status:
+      loadBalancer: {}
+    #Postgres
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: postgres
+      name: postgres
+    spec:
+      type: LoadBalancer
+      ports:
+        - name: "3002"
+          port: 3002
+          targetPort: 3002
+      selector:
+        io.kompose.service: postgres
+    status:
+      loadBalancer: {}
+    #Api
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: go-api
+    spec:
+      ports:
+        - name: "3001"
+          port: 3001
+          targetPort: 3001
+      selector:
+        io.kompose.service: prueba-dev  
+    status:
+      loadBalancer: {}
+
+  #Graphql
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: graphql-engine
+      name: graphql-engine
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: graphql-engine
+      strategy: {}
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            io.kompose.service: graphql-engine
+        spec:
+          containers:
+            - env:
+                - name: HASURA_GRAPHQL_ADMIN_SECRET
+                - name: HASURA_GRAPHQL_DATABASE_URL
+                  value: postgres://:@postgres:5432/
+                - name: HASURA_GRAPHQL_DEV_MODE
+                  value: "true"
+                - name: HASURA_GRAPHQL_ENABLED_LOG_TYPES
+                  value: startup, http-log, webhook-log, websocket-log, query-log
+                - name: HASURA_GRAPHQL_ENABLE_CONSOLE
+                  value: "true"
+                - name: HASURA_GRAPHQL_METADATA_DATABASE_URL
+                  value: postgres://:@postgres:5432/
+                - name: PG_DATABASE_URL
+                  value: postgres://:@postgres:5432/
+              image: hasura/graphql-engine:v2.15.0
+              name: graphql-engine
+              ports:
+                - containerPort: 8080
+              resources: {}
+          restartPolicy: Always
+    status: {}
+  #Postgres
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml -o kubemanifests.yaml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: postgres
+      name: postgres
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: postgres
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations:
+            kompose.cmd: kompose convert -f docker-compose.yml -o kubemanifests.yaml
+            kompose.version: 1.26.1 (a9d05d509)
+          creationTimestamp: null
+          labels:
+            io.kompose.service: postgres
+        spec:
+          containers:
+            - env:
+                - name: API_GEOCODING
+                  valueFrom:
+                    configMapKeyRef:
+                      key: API_GEOCODING
+                      name: env
+                - name: BASIC_AUTH_PASS
+                  valueFrom:
+                    configMapKeyRef:
+                      key: BASIC_AUTH_PASS
+                      name: env
+                - name: BASIC_AUTH_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      key: BASIC_AUTH_USER
+                      name: env
+                - name: HASURA_GRAPHQL_ADMIN_SECRET
+                  valueFrom:
+                    configMapKeyRef:
+                      key: HASURA_GRAPHQL_ADMIN_SECRET
+                      name: env
+                - name: POSTGRES_DB
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_DB
+                      name: env
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_PASSWORD
+                      name: env
+                - name: POSTGRES_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_USER
+                      name: env
+              image: postgres:12
+              name: postgres
+              ports:
+                - containerPort: 3002
+              resources: {}
+              volumeMounts:
+                - mountPath: /var/lib/postgresql/data
+                  name: db-data
+                - mountPath: /docker-entrypoint-initdb.d/create_tables.sql
+                  name: postgres-claim1
+          restartPolicy: Always
+          volumes:
+            - name: db-data
+              persistentVolumeClaim:
+                claimName: db-data
+            - name: postgres-claim1
+              persistentVolumeClaim:
+                claimName: postgres-claim1
+    status: {}
+  #Api
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: prueba-dev  
+      name: prueba-dev  
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: prueba-dev  
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            io.kompose.service: prueba-dev  
+        spec:
+          containers:
+            - env:
+                - name: API_GEOCODING
+                  valueFrom:
+                    configMapKeyRef:
+                      key: API_GEOCODING
+                      name: env
+                - name: BASIC_AUTH_PASS
+                  valueFrom:
+                    configMapKeyRef:
+                      key: BASIC_AUTH_PASS
+                      name: env
+                - name: BASIC_AUTH_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      key: BASIC_AUTH_USER
+                      name: env
+                - name: HASURA_GRAPHQL_ADMIN_SECRET
+                  valueFrom:
+                    configMapKeyRef:
+                      key: HASURA_GRAPHQL_ADMIN_SECRET
+                      name: env
+                - name: POSTGRES_DB
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_DB
+                      name: env
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_PASSWORD
+                      name: env
+                - name: POSTGRES_USER
+                  valueFrom:
+                    configMapKeyRef:
+                      key: POSTGRES_USER
+                      name: env
+              image: prueba-dev  
+              imagePullPolicy: Never
+              name: go-api
+              ports:
+                - containerPort: 3001
+              resources: {}
+              volumeMounts:
+                - mountPath: /app
+                  name: dev-claim0
+          restartPolicy: Always
+          volumes:
+            - name: dev-claim0
+              persistentVolumeClaim:
+                claimName: dev-claim0 
+
+    #Data para la api
+  - apiVersion: v1
+    data:
+      API_GEOCODING: pAGhvIdAnzlQOKMEwl6jK7zWygedjlYG
+      BASIC_AUTH_PASS: pass
+      BASIC_AUTH_USER: user
+      HASURA_GRAPHQL_ADMIN_SECRET: "123456"
+      POSTGRES_DB: QA
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: user
+    kind: ConfigMap
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: dev-env
+      name: env
+
+    #Volumenes
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: dev-claim0
+      name: dev-claim0
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: postgres-claim1
+      name: postgres-claim1
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+
+kind: List
+metadata: {}

@@ -24,7 +24,7 @@ func BasicAuth(c *gin.Context) {
 }
 
 func LocationIdUnit(c *gin.Context) {
-	// Body Http
+	// Body Http obtener
 	var payload idInterface
 	if err := c.BindJSON(&payload); err != nil {
 		var errorString string = fmt.Sprintf("Error in payload: %v\n%s", payload, err.Error())
@@ -74,6 +74,7 @@ func UnitsAvailable(c *gin.Context) {
 }
 
 func BoroughsAvailable(c *gin.Context) {
+	//Consulta a Graphql
 	hasuraResponse := HasuraRequestUnits()
 	fmt.Println(hasuraResponse)
 	if len(hasuraResponse.Data.Mb) == 0 {
@@ -102,6 +103,7 @@ func UnitsPerBorough(c *gin.Context) {
 	}
 	fmt.Println("Borough consulted-> ", payload.Borough)
 
+	//Consulta a Graphql
 	hasuraResponse := HasuraRequestUnits()
 	fmt.Println(hasuraResponse)
 	if len(hasuraResponse.Data.Mb) == 0 {
@@ -111,6 +113,7 @@ func UnitsPerBorough(c *gin.Context) {
 		return
 	}
 
+	//Filtro sobre la alcaldia
 	unitsBorough := filterBorough(hasuraResponse, payload.Borough)
 	bytesResponse, err := json.Marshal(unitsBorough)
 	if err != nil {

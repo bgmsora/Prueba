@@ -12,12 +12,17 @@ Prueba técnica: Data pipeline
 ![Alt text](doc/resource/track.png?raw=true "Title")
 
 ### 2. Analisis de los datos
-1. Se revisaran las consultas que se piden y los datos que se tienen para dar una solucion optima
-2. Traducir coordenadas a direcciones, se ocupo una Api externa, porque se intento ocupar un json interno, pero pesaba demasiado para incluirlo en un docker
+1. Para traducir coordenadas a direcciones, se ocupo una Api externa, porque se intento ocupar un json interno, pero pesaba demasiado para incluirlo en un docker
+
+### 3. K8s
+Para este caso se tiene kubemanifests.yaml y su archivo de enviroment env.yaml
 
 ### Nota
-Todas los datos de acceso o configuraciones se encuentran en el archivo .env, que fue enviado con el correo
+Todas los datos de acceso o configuraciones se encuentran en el archivo .env y env.yaml, que fue enviado con el correo
 
 ### Postman Workspace
 Pruebas integrales 
 ID:  dea07cb7-98de-49fe-bdc7-d628ecce7c23
+
+### Pruebas unitarias
+Estas se encuentran en la carpetas services en el archivo api_test.go, se puede ejecutar con go test

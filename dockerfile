@@ -14,6 +14,8 @@ RUN CGO_ENABLED=0 go build -ldflags "-s -w" -buildvcs=false -o main .
 ###############
 FROM base AS dev
 
+#Dependiendo la version de docker es necesario el go get o no
+RUN go get github.com/githubnemo/CompileDaemon  
 RUN go install github.com/githubnemo/CompileDaemon
 ENTRYPOINT CompileDaemon --build="go build -o main -buildvcs=false" --command="./main" 
 

@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// Funcion que nos regesa una direccion apartir de la latitud y longitud
 func ReverseGeocode(lat float64, lng float64) (add responseAdressInterface) {
 	var data locationStructure
 	data.Location.LatLng.Lat = lat
@@ -157,6 +158,7 @@ func removeDuplicateStr(strSlice []string) []string {
 	return list
 }
 
+// Funcion generica para hacer la comunicacion con graphql
 func hasuraRequest(payload *strings.Reader) (body []byte) {
 	url := "http://host.docker.internal:8080/v1/graphql"
 	method := "POST"

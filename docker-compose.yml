@@ -3,7 +3,7 @@ services:
   dev:
     depends_on:
     - "graphql-engine"
-    container_name: go_root
+    container_name: go_Api
     env_file: ./.env
     build:
       context: .
@@ -13,12 +13,19 @@ services:
       - "3001:3001"
     volumes:
       - .:/app
-    restart: unless-stopped
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "1"
+        max-size: "1m"
     extra_hosts:
       - host.docker.internal:host-gateway
 
   postgres:
     image: postgres:12
+    ports:
+      - "3002:3002"
     restart: always
     logging:
       driver: "json-file"
