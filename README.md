@@ -25,4 +25,4 @@ Pruebas integrales
 ID:  dea07cb7-98de-49fe-bdc7-d628ecce7c23
 
 ### Pruebas unitarias
-Estas se encuentran en la carpetas services en el archivo api_test.go, se puede ejecutar con go test
+Estas se encuentran en la carpeta services en el archivo api_test.go, se puede ejecutar con go test

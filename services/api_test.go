@@ -3,6 +3,7 @@ package services_test
 import (
 	"Api/root/services"
 	"encoding/json"
+	"reflect"
 	"testing"
 )
 
@@ -92,6 +93,46 @@ func TestHasuraRequestIdVehicle(t *testing.T) {
 				t.Log("Id not exist in DB: ", tc.Id)
 			} else {
 				t.Log("Test finalizado correctamente ", result)
+			}
+		})
+	}
+}
+
+func TestRemoveDuplicate(t *testing.T) {
+	testCases := []struct {
+		Name     string
+		Slice    []string
+		Expected []string
+	}{
+		{
+			Name:     "Id no registrado",
+			Slice:    []string{"India", "Canada", "Japan", "India", "Canada"},
+			Expected: []string{"India", "Canada", "Japan"},
+		},
+		{
+			Name:     "Id registrado 2",
+			Slice:    []string{"a", "a", "a", "a", "a"},
+			Expected: []string{"a"},
+		},
+		{
+			Name:     "Id registrado 3",
+			Slice:    []string{"Iztapalapa", "Iztapalapa", "Tláhuac", "Tláhuac", "Gustavo A. Madero"},
+			Expected: []string{"Iztapalapa", "Tláhuac", "Gustavo A. Madero"},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			result := services.RemoveDuplicateStr(tc.Slice)
+
+			if reflect.DeepEqual(result, tc.Expected) {
+				t.Log("Test finalizado correctamente ", result)
+			} else {
+				t.Error("Test no pasado ", result, " != ", tc.Expected)
 			}
 		})
 	}

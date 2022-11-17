@@ -83,6 +83,8 @@ func BoroughsAvailable(c *gin.Context) {
 		c.Data(http.StatusOK, "application/json", []byte(errorString))
 		return
 	}
+
+	//Obtener las alcaldias
 	unitsBorough := getBorough(hasuraResponse)
 	bytesResponse, err := json.Marshal(unitsBorough)
 	if err != nil {

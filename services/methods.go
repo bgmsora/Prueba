@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// Funcion que nos regesa una direccion apartir de la latitud y longitud
+// Funcion que nos regresa una direccion apartir de la latitud y longitud
 func ReverseGeocode(lat float64, lng float64) (add responseAdressInterface) {
 	var data locationStructure
 	data.Location.LatLng.Lat = lat
@@ -61,6 +61,7 @@ func ReverseGeocode(lat float64, lng float64) (add responseAdressInterface) {
 	return add
 }
 
+// Esta es la query para graphql de la solicitud por id (HasuraRequestId)
 const queryBusId string = "{\"query\":\"query MyQuery ($id:Int){\\r\\n  mb(where: {vehicle_id: {_eq: $id}}) {\\r\\n    position_latitude\\r\\n    position_longitude\\r\\n  }\\r\\n}\",\"variables\":{\"id\":XWFFF}}"
 
 func HasuraRequestId(id int) (add responseHasuraId) {
@@ -83,6 +84,7 @@ func HasuraRequestId(id int) (add responseHasuraId) {
 	return add
 }
 
+// Esta es la query para graphql de la solicitud para unidades disponibles (HasuraRequestUnitAvailable)
 const queryUnitsAvailable string = "{\"query\":\"query MyQuery {\\r\\n  mb(where: {trip_schedule_relationship: {_eq: 0}}) {\\r\\n    vehicle_id\\r\\n    position_latitude\\r\\n    position_longitude\\r\\n    trip_start_date\\r\\n    trip_id\\r\\n    position_speed\\r\\n    \\r\\n  }\\r\\n}\",\"variables\":{}}"
 
 func HasuraRequestUnitAvailable() (add responseHasuraUnitsAvailable) {
@@ -102,6 +104,7 @@ func HasuraRequestUnitAvailable() (add responseHasuraUnitsAvailable) {
 	return add
 }
 
+// Esta es la query para graphql de la solicitud de unidades (HasuraRequestUnits)
 const queryUnits string = "{\"query\":\"query MyQuery {\\r\\n  mb {\\r\\n    vehicle_id\\r\\n    position_latitude\\r\\n    position_longitude\\r\\n    trip_start_date\\r\\n    trip_id\\r\\n    position_speed\\r\\n    \\r\\n  }\\r\\n}\",\"variables\":{}}"
 
 func HasuraRequestUnits() (add responseHasuraUnitsAvailable) {
@@ -121,6 +124,22 @@ func HasuraRequestUnits() (add responseHasuraUnitsAvailable) {
 	return add
 }
 
+// Se hace un filtro sobre la ciudad con respecto a Ciudad de México
+func getBorough(units responseHasuraUnitsAvailable) []string {
+	boroughs := make([]string, 31)
+	for _, arr := range units.Data.Mb {
+		response := ReverseGeocode(arr.PositionLatitude, arr.PositionLongitude)
+		fmt.Println(response)
+		if response.City == "Ciudad de México" {
+			boroughs = append(boroughs, response.Borough)
+		}
+	}
+	aux := RemoveDuplicateStr(boroughs)
+	remove := aux[1:]
+	return remove
+}
+
+// Filtro para obtener solo las unidades de determinada alcaldia
 func filterBorough(units responseHasuraUnitsAvailable, borough string) (new responseHasuraUnitsAvailable) {
 	for _, arr := range units.Data.Mb {
 		response := ReverseGeocode(arr.PositionLatitude, arr.PositionLongitude)
@@ -132,21 +151,7 @@ func filterBorough(units responseHasuraUnitsAvailable, borough string) (new resp
 	return new
 }
 
-func getBorough(units responseHasuraUnitsAvailable) []string {
-	boroughs := make([]string, 31)
-	for _, arr := range units.Data.Mb {
-		response := ReverseGeocode(arr.PositionLatitude, arr.PositionLongitude)
-		fmt.Println(response)
-		if response.City == "Ciudad de México" {
-			boroughs = append(boroughs, response.Borough)
-		}
-	}
-	aux := removeDuplicateStr(boroughs)
-	remove := aux[1:]
-	return remove
-}
-
-func removeDuplicateStr(strSlice []string) []string {
+func RemoveDuplicateStr(strSlice []string) []string {
 	allKeys := make(map[string]bool)
 	list := []string{}
 	for _, item := range strSlice {
