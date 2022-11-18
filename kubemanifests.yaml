@@ -234,8 +234,7 @@ items:
                     configMapKeyRef:
                       key: POSTGRES_USER
                       name: env
-              image: prueba-dev  
-              imagePullPolicy: Never
+              image: bgmrand/test:latest
               name: go-api
               ports:
                 - containerPort: 3001
@@ -288,6 +287,20 @@ items:
       labels:
         io.kompose.service: postgres-claim1
       name: postgres-claim1
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Mi
+    status: {}
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: db-data
+      name: db-data
     spec:
       accessModes:
         - ReadWriteOnce

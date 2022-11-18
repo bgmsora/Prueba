@@ -16,6 +16,40 @@ type responseAdressInterface struct {
 	Street  string `json:"calle"`
 }
 
+type responseBoroughs struct {
+	Data []struct {
+		boroughInterface
+	} `json:"data"`
+}
+
+type dataVehicle struct {
+	Vehicle_id        int     `json:"vehicle_id"`
+	PositionLatitude  float64 `json:"position_latitude"`
+	PositionLongitude float64 `json:"position_longitude"`
+	Trip_start_date   int     `json:"trip_start_date"`
+	Trip_id           int     `json:"trip_id"`
+	Position_speed    int     `json:"position_speed"`
+}
+
+type locationStructure struct {
+	Location struct {
+		LatLng struct {
+			Lat float64 `json:"lat"`
+			Lng float64 `json:"lng"`
+		} `json:"latLng"`
+	} `json:"location"`
+	Options struct {
+		ThumbMaps bool `json:"thumbMaps"`
+	} `json:"options"`
+	IncludeNearestIntersection bool `json:"includeNearestIntersection"`
+	IncludeRoadMetadata        bool `json:"includeRoadMetadata"`
+}
+
+type LatLng struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
+}
+
 type Info struct {
 	Copyright struct {
 		Text         string `json:"text"`
@@ -70,25 +104,6 @@ type GeocodingResult struct {
 	} `json:"results"`
 }
 
-type LatLng struct {
-	Lat float64 `json:"lat"`
-	Lng float64 `json:"lng"`
-}
-
-type locationStructure struct {
-	Location struct {
-		LatLng struct {
-			Lat float64 `json:"lat"`
-			Lng float64 `json:"lng"`
-		} `json:"latLng"`
-	} `json:"location"`
-	Options struct {
-		ThumbMaps bool `json:"thumbMaps"`
-	} `json:"options"`
-	IncludeNearestIntersection bool `json:"includeNearestIntersection"`
-	IncludeRoadMetadata        bool `json:"includeRoadMetadata"`
-}
-
 type responseHasuraId struct {
 	Data struct {
 		Mb []struct {
@@ -103,20 +118,5 @@ type responseHasuraUnitsAvailable struct {
 		Mb []struct {
 			dataVehicle
 		} `json:"mb"`
-	} `json:"data"`
-}
-
-type dataVehicle struct {
-	Vehicle_id        int     `json:"vehicle_id"`
-	PositionLatitude  float64 `json:"position_latitude"`
-	PositionLongitude float64 `json:"position_longitude"`
-	Trip_start_date   int     `json:"trip_start_date"`
-	Trip_id           int     `json:"trip_id"`
-	Position_speed    int     `json:"position_speed"`
-}
-
-type responseBoroughs struct {
-	Data []struct {
-		boroughInterface
 	} `json:"data"`
 }

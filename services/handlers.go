@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Verifica los datos de conexion de un usuario
 func BasicAuth(c *gin.Context) {
 	reqUser, reqPass, hasAuth := c.Request.BasicAuth()
 
@@ -23,6 +24,7 @@ func BasicAuth(c *gin.Context) {
 	}
 }
 
+// Obtiene la direccion de una unidad por su identificador unico (vehicle_id)
 func LocationIdUnit(c *gin.Context) {
 	// Body Http obtener
 	var payload idInterface
@@ -55,6 +57,7 @@ func LocationIdUnit(c *gin.Context) {
 	c.Data(http.StatusOK, "application/json", bytesResponse)
 }
 
+// Obtienes las unidades disponibles
 func UnitsAvailable(c *gin.Context) {
 	//Consulta a Graphql
 	hasuraResponse := HasuraRequestUnitAvailable()
@@ -73,6 +76,7 @@ func UnitsAvailable(c *gin.Context) {
 	c.Data(http.StatusOK, "application/json", bytesResponse)
 }
 
+// Obtiene las alcaldias disponibles
 func BoroughsAvailable(c *gin.Context) {
 	//Consulta a Graphql
 	hasuraResponse := HasuraRequestUnits()
@@ -94,6 +98,7 @@ func BoroughsAvailable(c *gin.Context) {
 	c.Data(http.StatusOK, "application/json", bytesResponse)
 }
 
+// Obtiene las unidades con respecto a una alcaldia
 func UnitsPerBorough(c *gin.Context) {
 	// Body Http
 	var payload boroughInterface

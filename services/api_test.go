@@ -41,7 +41,7 @@ func TestGetAddress(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.Name, func(t *testing.T) {
-			t.Parallel() //Se ocupa esto para paralelizar las pruebas
+			t.Parallel() //Crea hilos para cada solicitud
 
 			result := services.ReverseGeocode(tc.Lat, tc.Lng)
 

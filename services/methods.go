@@ -1,6 +1,7 @@
 package services
 
 import (
+	"Api/root/services/tools"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -12,7 +13,7 @@ import (
 )
 
 // Funcion que nos regresa una direccion apartir de la latitud y longitud
-func ReverseGeocode(lat float64, lng float64) (add responseAdressInterface) {
+func ReverseGeocode(lat float64, lng float64) (addressResponse responseAdressInterface) {
 	var data locationStructure
 	data.Location.LatLng.Lat = lat
 	data.Location.LatLng.Lng = lng
@@ -51,21 +52,20 @@ func ReverseGeocode(lat float64, lng float64) (add responseAdressInterface) {
 		return
 	}
 
-	//Si retorna vacio, porque la direccion no es valida
+	//Si  la direccion no es valida
 	if len(address.Results[0].Locations) == 0 {
 		return
 	}
-	add.Borough = address.Results[0].Locations[0].AdminArea5
-	add.City = address.Results[0].Locations[0].AdminArea4
-	add.Street = address.Results[0].Locations[0].Street
-	return add
+
+	addressResponse.Borough = address.Results[0].Locations[0].AdminArea5
+	addressResponse.City = address.Results[0].Locations[0].AdminArea4
+	addressResponse.Street = address.Results[0].Locations[0].Street
+	return addressResponse
 }
 
-// Esta es la query para graphql de la solicitud por id (HasuraRequestId)
-const queryBusId string = "{\"query\":\"query MyQuery ($id:Int){\\r\\n  mb(where: {vehicle_id: {_eq: $id}}) {\\r\\n    position_latitude\\r\\n    position_longitude\\r\\n  }\\r\\n}\",\"variables\":{\"id\":XWFFF}}"
-
-func HasuraRequestId(id int) (add responseHasuraId) {
-	data := strings.Replace(queryBusId, "XWFFF", strconv.Itoa(id), 1)
+// Solicitud a graphql de la posicion de latitud y longitud con respecto al identificador
+func HasuraRequestId(id int) (position responseHasuraId) {
+	data := strings.Replace(tools.QueryBusId, "XWFFF", strconv.Itoa(id), 1)
 	fmt.Println(data)
 	payload := strings.NewReader(data)
 
@@ -76,19 +76,17 @@ func HasuraRequestId(id int) (add responseHasuraId) {
 	}
 	fmt.Println(string(body))
 
-	if err := json.Unmarshal(body, &add); err != nil {
+	if err := json.Unmarshal(body, &position); err != nil {
 		nerr := fmt.Errorf("%s: %s, No se pudo parsear", err.Error(), body)
 		fmt.Println((nerr.Error()))
 		return
 	}
-	return add
+	return position
 }
 
-// Esta es la query para graphql de la solicitud para unidades disponibles (HasuraRequestUnitAvailable)
-const queryUnitsAvailable string = "{\"query\":\"query MyQuery {\\r\\n  mb(where: {trip_schedule_relationship: {_eq: 0}}) {\\r\\n    vehicle_id\\r\\n    position_latitude\\r\\n    position_longitude\\r\\n    trip_start_date\\r\\n    trip_id\\r\\n    position_speed\\r\\n    \\r\\n  }\\r\\n}\",\"variables\":{}}"
-
-func HasuraRequestUnitAvailable() (add responseHasuraUnitsAvailable) {
-	payload := strings.NewReader(queryUnitsAvailable)
+// Solitud de graphql para obtener los datos necesarios de todas las unidades disponibles
+func HasuraRequestUnitAvailable() (vehicles responseHasuraUnitsAvailable) {
+	payload := strings.NewReader(tools.QueryUnitsAvailable)
 	body := hasuraRequest(payload)
 	if body == nil {
 		fmt.Println(body)
@@ -96,19 +94,17 @@ func HasuraRequestUnitAvailable() (add responseHasuraUnitsAvailable) {
 	}
 	fmt.Println(string(body))
 
-	if err := json.Unmarshal(body, &add); err != nil {
+	if err := json.Unmarshal(body, &vehicles); err != nil {
 		nerr := fmt.Errorf("%s: %s, No se pudo parsear", err.Error(), body)
 		fmt.Println((nerr.Error()))
 		return
 	}
-	return add
+	return vehicles
 }
 
-// Esta es la query para graphql de la solicitud de unidades (HasuraRequestUnits)
-const queryUnits string = "{\"query\":\"query MyQuery {\\r\\n  mb {\\r\\n    vehicle_id\\r\\n    position_latitude\\r\\n    position_longitude\\r\\n    trip_start_date\\r\\n    trip_id\\r\\n    position_speed\\r\\n    \\r\\n  }\\r\\n}\",\"variables\":{}}"
-
-func HasuraRequestUnits() (add responseHasuraUnitsAvailable) {
-	payload := strings.NewReader(queryUnits)
+// Solicitud de graphql para obtener todos los datos necesarios de todas las unidades
+func HasuraRequestUnits() (vehicles responseHasuraUnitsAvailable) {
+	payload := strings.NewReader(tools.QueryUnits)
 	body := hasuraRequest(payload)
 	if body == nil {
 		fmt.Println(body)
@@ -116,15 +112,15 @@ func HasuraRequestUnits() (add responseHasuraUnitsAvailable) {
 	}
 	fmt.Println(string(body))
 
-	if err := json.Unmarshal(body, &add); err != nil {
+	if err := json.Unmarshal(body, &vehicles); err != nil {
 		nerr := fmt.Errorf("%s: %s, No se pudo parsear", err.Error(), body)
 		fmt.Println((nerr.Error()))
 		return
 	}
-	return add
+	return vehicles
 }
 
-// Se hace un filtro sobre la ciudad con respecto a Ciudad de México
+// Se hace un filtro sobre las direcciones para obtener las alcaldias
 func getBorough(units responseHasuraUnitsAvailable) []string {
 	boroughs := make([]string, 31)
 	for _, arr := range units.Data.Mb {
@@ -140,27 +136,15 @@ func getBorough(units responseHasuraUnitsAvailable) []string {
 }
 
 // Filtro para obtener solo las unidades de determinada alcaldia
-func filterBorough(units responseHasuraUnitsAvailable, borough string) (new responseHasuraUnitsAvailable) {
+func filterBorough(units responseHasuraUnitsAvailable, borough string) (vehicles responseHasuraUnitsAvailable) {
 	for _, arr := range units.Data.Mb {
 		response := ReverseGeocode(arr.PositionLatitude, arr.PositionLongitude)
 		fmt.Println(response)
 		if response.Borough == borough {
-			new.Data.Mb = append(new.Data.Mb, arr)
+			vehicles.Data.Mb = append(vehicles.Data.Mb, arr)
 		}
 	}
-	return new
-}
-
-func RemoveDuplicateStr(strSlice []string) []string {
-	allKeys := make(map[string]bool)
-	list := []string{}
-	for _, item := range strSlice {
-		if _, value := allKeys[item]; !value {
-			allKeys[item] = true
-			list = append(list, item)
-		}
-	}
-	return list
+	return vehicles
 }
 
 // Funcion generica para hacer la comunicacion con graphql
@@ -192,4 +176,16 @@ func hasuraRequest(payload *strings.Reader) (body []byte) {
 		return
 	}
 	return body
+}
+
+func RemoveDuplicateStr(strSlice []string) []string {
+	allKeys := make(map[string]bool)
+	list := []string{}
+	for _, item := range strSlice {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+			list = append(list, item)
+		}
+	}
+	return list
 }

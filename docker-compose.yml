@@ -10,7 +10,7 @@ services:
       target: dev
       dockerfile: ./dockerfile
     ports:
-      - "3001:3001"
+      - "${API_PORT}:${API_PORT}"
     volumes:
       - .:/app
     restart: always
