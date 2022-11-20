@@ -29,9 +29,9 @@ items:
     spec:
       type: LoadBalancer
       ports:
-        - name: "3002"
-          port: 3002
-          targetPort: 3002
+        - name: "5432"
+          port: 5432
+          targetPort: 5432
       selector:
         io.kompose.service: postgres
     status:
@@ -74,8 +74,12 @@ items:
           containers:
             - env:
                 - name: HASURA_GRAPHQL_ADMIN_SECRET
+                  valueFrom:
+                    configMapKeyRef:
+                      name: env
+                      key: HASURA_GRAPHQL_ADMIN_SECRET
                 - name: HASURA_GRAPHQL_DATABASE_URL
-                  value: postgres://:@postgres:5432/
+                  value: postgres://user:pass@postgres:5432/QA
                 - name: HASURA_GRAPHQL_DEV_MODE
                   value: "true"
                 - name: HASURA_GRAPHQL_ENABLED_LOG_TYPES
@@ -83,9 +87,9 @@ items:
                 - name: HASURA_GRAPHQL_ENABLE_CONSOLE
                   value: "true"
                 - name: HASURA_GRAPHQL_METADATA_DATABASE_URL
-                  value: postgres://:@postgres:5432/
+                  value: postgres://user:pass@postgres:5432/QA
                 - name: PG_DATABASE_URL
-                  value: postgres://:@postgres:5432/
+                  value: postgres://user:pass@postgres:5432/QA
               image: hasura/graphql-engine:v2.15.0
               name: graphql-engine
               ports:
@@ -235,6 +239,7 @@ items:
                       key: POSTGRES_USER
                       name: env
               image: bgmrand/test:latest
+              imagePullPolicy: IfNotPresent
               name: go-api
               ports:
                 - containerPort: 3001

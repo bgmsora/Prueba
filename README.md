@@ -26,7 +26,7 @@ https://hub.docker.com/repository/docker/bgmrand/test
 
 ### Postman Workspace
 Pruebas integración
-ID:  dea07cb7-98de-49fe-bdc7-d628ecce7c23
+https://www.postman.com/flight-physicist-92712039/workspace/prueba-tcnica/overview
 
 ### Pruebas unitarias
 Estas se encuentran en la carpeta services en el archivo api_test.go, se ejecutan con:

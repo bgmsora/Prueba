@@ -4,7 +4,6 @@ FROM golang:1.19.0-alpine3.15 AS base
 
 WORKDIR /app
 ADD . .
-#RUN mv .netrc ~/.netrc
 
 RUN apk update && apk add build-base git
 RUN go mod download

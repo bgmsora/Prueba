@@ -24,8 +24,6 @@ services:
 
   postgres:
     image: postgres:12
-    ports:
-      - "3002:3002"
     restart: always
     logging:
       driver: "json-file"
