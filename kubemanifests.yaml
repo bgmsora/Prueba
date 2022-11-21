@@ -42,6 +42,7 @@ items:
     metadata:
       name: go-api
     spec:
+      type: LoadBalancer
       ports:
         - name: "3001"
           port: 3001
@@ -238,7 +239,12 @@ items:
                     configMapKeyRef:
                       key: POSTGRES_USER
                       name: env
-              image: bgmrand/test:latest
+                - name: API_PORT
+                  valueFrom:
+                    configMapKeyRef:
+                      key: API_PORT
+                      name: env
+              image: bgmsora/test:latest
               imagePullPolicy: IfNotPresent
               name: go-api
               ports:
@@ -252,23 +258,6 @@ items:
             - name: dev-claim0
               persistentVolumeClaim:
                 claimName: dev-claim0 
-
-    #Data para la api
-  - apiVersion: v1
-    data:
-      API_GEOCODING: pAGhvIdAnzlQOKMEwl6jK7zWygedjlYG
-      BASIC_AUTH_PASS: pass
-      BASIC_AUTH_USER: user
-      HASURA_GRAPHQL_ADMIN_SECRET: "123456"
-      POSTGRES_DB: QA
-      POSTGRES_PASSWORD: pass
-      POSTGRES_USER: user
-    kind: ConfigMap
-    metadata:
-      creationTimestamp: null
-      labels:
-        io.kompose.service: dev-env
-      name: env
 
     #Volumenes
   - apiVersion: v1

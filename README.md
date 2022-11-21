@@ -14,7 +14,7 @@ Brandon Gómez
 ![Alt text](doc/resource/track.png?raw=true "Title")
 
 ### 2. Analisis de los datos
-1. Traduce coordenadas a direcciones ocupando una Api externa, ya que al ocupar un archivo de configuración que contenía todas las coordenadas ocupaba mucha memoria para incluirlo en un docker
+Traducir coordenadas a direcciones ocupando una Api externa, ya que al ocupar un archivo de configuración que contenía todas las coordenadas ocupaba mucha memoria para incluirlo en un docker
 
 ### 3. Kubernetes (k8s)
 Para el despliegue se tienen los archivos kubemanifests.yaml y su archivo de variables de ambiente env.yaml
@@ -22,7 +22,19 @@ Para el despliegue se tienen los archivos kubemanifests.yaml y su archivo de var
 ### Notas
 Todos los datos de acceso o configuraciones se encuentran en el archivo **.env** y **env.yaml**, que viene adjunto en el correo.
 Se publico una imagen de la Api para poder ser utilizada en kubernetes en el siguiente enlace:
-https://hub.docker.com/repository/docker/bgmrand/test
+https://hub.docker.com/repository/docker/bgmsora/test
+
+Si no se está corriendo el servicio de K8s en la nube se recomienda usar minikube, porque al querer hacer la menor cantidad de configuraciones no se hizo el uso de ingress porque se requería configurar externamente con Nginx o en su defecto modificar el archivo  */etc/hosts*
+Por lo cual se recomienda lo siguiente:
+```console
+foo@bar:~$ minikube start
+foo@bar:~$ kubectl apply -f kubemanifests.yaml
+foo@bar:~$ kubectl apply -f env.yaml
+foo@bar:~$ minikube tunnel
+```
+También en Hasura en la pestaña de Data, en el anexo SQL copiar el archivo 
+**/db/init.sql**
+Para rellenar la base de datos
 
 ### Postman Workspace
 Pruebas integración
@@ -33,9 +45,6 @@ Estas se encuentran en la carpeta services en el archivo api_test.go, se ejecuta
 ```console
 foo@bar:~$ go test
 ```
-
-
-
 
 ### Diagrama de secuencia 
 ![Alt text](doc/resource/SequenceDiagram.png?raw=true "Title")
